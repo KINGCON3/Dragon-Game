@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Movement : MonoBehaviour
+public class OldMovement : MonoBehaviour
 {
     [SerializeField] private int speed = 5;
 
