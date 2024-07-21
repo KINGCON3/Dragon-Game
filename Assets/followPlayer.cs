@@ -34,7 +34,7 @@ public class followPlayer : MonoBehaviour
             // Calculate the position on the circle's circumference
             Vector3 squarePosition = new Vector3(
                 character.position.x + circleRadius * Mathf.Cos(angle),
-                character.position.y, // Keep the original Y position
+                character.position.y + 0.5f, // Keep the original Y position
                 character.position.z + circleRadius * Mathf.Sin(angle)
             );
 
