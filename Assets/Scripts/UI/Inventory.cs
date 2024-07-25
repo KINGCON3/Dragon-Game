@@ -29,7 +29,7 @@ public class Inventory : MonoBehaviour
         }
 
         //Add Items for testing
-        AddItem(new WoodItem(), 40);
+        AddItem(new WoodItem(), 44);
         AddItem(new StoneItem(), 20);
     }
 
@@ -50,6 +50,10 @@ public class Inventory : MonoBehaviour
                 //Cursor.lockState = CursorLockMode.Confined;
                 RefreshInventory();
             }
+        }
+        if (Input.GetKeyDown(KeyCode.Mouse1) && mouse.itemSlot.item != null)
+        {
+            RefreshInventory();
         }
     }
 
@@ -156,5 +160,10 @@ public class Inventory : MonoBehaviour
     {
         slot.item = null;
         slot.stacks = 0;
+    }
+
+    public List<ItemSlotInfo> getItems()
+    {
+        return items;
     }
 }
