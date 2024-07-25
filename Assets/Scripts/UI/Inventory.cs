@@ -13,6 +13,8 @@ public class Inventory : MonoBehaviour
     public GameObject itemPanel;
     public GameObject itemPanelGrid;
 
+    public Mouse mouse;
+
     private List<ItemPanel> existingPanels = new List<ItemPanel>();
 
     [Space]
@@ -23,8 +25,12 @@ public class Inventory : MonoBehaviour
     {
         for (int i = 0; i < inventorySize; i++)
         {
-            items.Add(new ItemSlotInfo(null,0));
+            items.Add(new ItemSlotInfo(null, 0));
         }
+
+        //Add Items for testing
+        AddItem(new WoodItem(), 40);
+        AddItem(new StoneItem(), 20);
     }
 
     // Update is called once per frame
@@ -35,6 +41,7 @@ public class Inventory : MonoBehaviour
                if (inventoryMenu.activeSelf)
             {
                 inventoryMenu.SetActive(false);
+                mouse.EmptySlot();
                 //Cursor.lockState = CursorLockMode.Locked;
             }
             else
@@ -80,6 +87,7 @@ public class Inventory : MonoBehaviour
                 {
                     panel.itemImage.gameObject.SetActive(true);
                     panel.itemImage.sprite = i.item.GiveItemImage();
+                    panel.itemImage.CrossFadeAlpha(1, 0.05f, true);
                     panel.stacksText.gameObject.SetActive(true);
                     panel.stacksText.text = "" + i.stacks;
                 }
@@ -91,6 +99,7 @@ public class Inventory : MonoBehaviour
             }
             index++;
         }
+        mouse.EmptySlot();
     }
 
     public int AddItem(Item item, int amount)
@@ -119,7 +128,7 @@ public class Inventory : MonoBehaviour
         //Fill empty slots with leftover items
         foreach(ItemSlotInfo i in items)
         {
-            if (i.item != null)
+            if (i.item == null)
             {
                 if (amount > item.MaxStacks())
                 {
@@ -131,13 +140,14 @@ public class Inventory : MonoBehaviour
                 {
                     i.item = item;
                     i.stacks = amount;
-                    if (inventoryMenu.activeSelf ) RefreshInventory();
+                    if (inventoryMenu.activeSelf) RefreshInventory();
                     return 0;
                 }
             }
         }
         //No space in Inventory, return remainder items
         Debug.Log("No space in Inventory for: " + item.GiveName());
+        Debug.Log(amount);
         if (inventoryMenu.activeSelf) RefreshInventory();
         return amount;
     }
