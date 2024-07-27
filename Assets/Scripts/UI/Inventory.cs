@@ -17,6 +17,8 @@ public class Inventory : MonoBehaviour
 
     private List<ItemPanel> existingPanels = new List<ItemPanel>();
 
+    Dictionary<string, Item> allItemsDictionary = new Dictionary<string, Item>();
+
     [Space]
     public int inventorySize = 44;
 
@@ -28,9 +30,26 @@ public class Inventory : MonoBehaviour
             items.Add(new ItemSlotInfo(null, 0));
         }
 
+        List<Item> allItems = GetAllItems().ToList();
+        string itemsInDictionary = " Items in Dictionary: ";
+        foreach (Item i in allItems)
+        {
+            if (!allItemsDictionary.ContainsKey(i.GiveName()))
+            {
+                allItemsDictionary.Add(i.GiveName(), i);
+                itemsInDictionary += ", " + i.GiveName();
+            }
+            else
+            {
+                Debug.Log("" + " already exists in Dictionary - shares name with " + allItemsDictionary[i.GiveName()]);
+            }
+        }
+        itemsInDictionary += ".";
+        Debug.Log(itemsInDictionary);
+
         //Add Items for testing
-        AddItem(new WoodItem(), 44);
-        AddItem(new StoneItem(), 20);
+        AddItem("Wood", 44);
+        AddItem("Stone", 20);
     }
 
     // Update is called once per frame
@@ -106,8 +125,18 @@ public class Inventory : MonoBehaviour
         mouse.EmptySlot();
     }
 
-    public int AddItem(Item item, int amount)
+    public int AddItem(string itemName, int amount)
     {
+        //Find item to add
+        Item item = null;
+        allItemsDictionary.TryGetValue(itemName, out item);
+        //Exit method if no Item was found
+        if (item == null)
+        {
+            Debug.Log("Could not find Item in Dictionary to add to Inventory");
+            return amount;
+        }
+
         //Check for open spaces in existing slots
         foreach(ItemSlotInfo i in items)
         {
@@ -165,5 +194,12 @@ public class Inventory : MonoBehaviour
     public List<ItemSlotInfo> getItems()
     {
         return items;
+    }
+
+    IEnumerable<Item> GetAllItems()
+    {
+        return System.AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes()).Where(type => type.IsSubclassOf(typeof(Item)))
+            .Select(type => System.Activator.CreateInstance(type) as Item);
     }
 }

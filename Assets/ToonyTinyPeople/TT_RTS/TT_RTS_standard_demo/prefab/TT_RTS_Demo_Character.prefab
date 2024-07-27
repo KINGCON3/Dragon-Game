@@ -238,6 +238,7 @@ GameObject:
   - component: {fileID: 4074801430939558507}
   - component: {fileID: 2600995824459849127}
   - component: {fileID: 7496749799526598652}
+  - component: {fileID: 5818818504237091718}
   m_Layer: 0
   m_Name: TT_RTS_Demo_Character
   m_TagString: Player
@@ -308,8 +309,8 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!114 &2600995824459849127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -354,6 +355,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 4074801430939558507}
   moveSpeed: 5
+--- !u!136 &5818818504237091718
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121574}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.6325989
+  m_Height: 1.9077944
+  m_Direction: 1
+  m_Center: {x: -0.03744507, y: 0.9978028, z: 0}
 --- !u!1 &131548
 GameObject:
   m_ObjectHideFlags: 0
