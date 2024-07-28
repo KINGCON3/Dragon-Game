@@ -23,6 +23,6 @@ public class ItemPickup : MonoBehaviour
     {
         Debug.Log("Touched again");
         amount = inventory.AddItem(itemToDrop, amount);
-        if (amount < 1) Destroy(this.gameObject);
+        if (amount < 1) Destroy(this.transform.root.gameObject);
     }
 }

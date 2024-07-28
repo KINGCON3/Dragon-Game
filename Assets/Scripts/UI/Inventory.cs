@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Linq;
+using Unity.Services.Matchmaker.Models;
 
 public class Inventory : MonoBehaviour
 {
@@ -14,6 +16,7 @@ public class Inventory : MonoBehaviour
     public GameObject itemPanelGrid;
 
     public Mouse mouse;
+    public GameObject player;
 
     private List<ItemPanel> existingPanels = new List<ItemPanel>();
 
@@ -73,6 +76,13 @@ public class Inventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1) && mouse.itemSlot.item != null)
         {
             RefreshInventory();
+        }
+        if (Input.GetKeyDown(KeyCode.Mouse0) && mouse.itemSlot.item != null && !EventSystem.current.IsPointerOverGameObject()) {
+            DropItem(mouse.itemSlot.item.GiveName());
+        }
+        if (Input.GetKeyDown(KeyCode.Q) && mouse.itemSlot.item != null)
+        {
+            DropItem(mouse.itemSlot.item.GiveName());
         }
     }
 
@@ -183,6 +193,39 @@ public class Inventory : MonoBehaviour
         Debug.Log(amount);
         if (inventoryMenu.activeSelf) RefreshInventory();
         return amount;
+    }
+
+    public void DropItem(string itemName)
+    {
+        //Find item to add
+        Item item = null;
+        allItemsDictionary.TryGetValue(itemName, out item);
+        //Exit method if no Item was found
+        if (item == null)
+        {
+            Debug.Log("Could not find Item in Dictionary to drop");
+        }
+
+        Transform camTransform = player.transform;
+
+        GameObject droppedItem = Instantiate(item.DropObject(),
+            camTransform.transform.position + new Vector3(0, 0, 3f) + camTransform.forward,
+            Quaternion.Euler(Vector3.zero));
+
+        Rigidbody rb = droppedItem.GetComponent<Rigidbody>();
+        if (rb != null) rb.velocity = camTransform.forward * 5;
+
+        ItemPickup ip = droppedItem.GetComponentInChildren<ItemPickup>();
+        if (ip != null)
+        {
+            ip.itemToDrop = itemName;
+            ip.amount = mouse.splitSize;
+            mouse.itemSlot.stacks -= mouse.splitSize;
+        }
+
+        if (mouse.itemSlot.stacks < 1) ClearSlot(mouse.itemSlot);
+        mouse.EmptySlot();
+        RefreshInventory();
     }
 
     public void ClearSlot(ItemSlotInfo slot)
