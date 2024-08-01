@@ -5,6 +5,15 @@ using UnityEngine;
 public abstract class Item
 {
     public abstract string GiveName();
+
+    public virtual int GiveStar()
+    { return 0; }
+    public virtual int GiveColour() { return 0; }
+
+    //Colours:
+    //Green, yellow, orange, red, black, white
+    //1,2,3,4,5,6
+
     public virtual int MaxStacks()
     {
         return 30;

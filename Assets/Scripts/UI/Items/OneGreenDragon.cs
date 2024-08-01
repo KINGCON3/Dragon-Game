@@ -16,4 +16,8 @@ public class OneGreenDragon : Item
     {
         return Resources.Load<Sprite>("UI/Item Images/GreenDragon");
     }
+
+    public override int GiveStar()
+    { return 1; }
+    public override int GiveColour() { return 1; }
 }
