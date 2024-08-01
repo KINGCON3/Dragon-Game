@@ -18,6 +18,10 @@ public class ItemPanel : MonoBehaviour, IPointerEnterHandler, IPointerDownHandle
     public ItemSlotInfo itemSlot;
     public Image itemImage;
     public TextMeshProUGUI stacksText;
+    public Image starImage;
+    public Image confidenceImage;
+    public TextMeshProUGUI confidenceText;
+    public TextMeshProUGUI starText;
 
     private bool click;
 

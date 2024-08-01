@@ -53,6 +53,7 @@ public class Inventory : MonoBehaviour
         //Add Items for testing
         AddItem("Wood", 44);
         AddItem("Stone", 20);
+        AddItem("OneGreenDragon", 3);
     }
 
     // Update is called once per frame
@@ -121,13 +122,27 @@ public class Inventory : MonoBehaviour
                     panel.itemImage.gameObject.SetActive(true);
                     panel.itemImage.sprite = i.item.GiveItemImage();
                     panel.itemImage.CrossFadeAlpha(1, 0.05f, true);
-                    panel.stacksText.gameObject.SetActive(true);
-                    panel.stacksText.text = "" + i.stacks;
+                    if (panel.name.Contains("Dragon"))
+                    {
+                        Debug.Log("dragon");
+                        panel.starImage.gameObject.SetActive(true);
+                        panel.starText.gameObject.SetActive(true);
+                        panel.confidenceImage.gameObject.SetActive(true);
+                        panel.confidenceText.gameObject.SetActive(true);
+                    } else
+                    {
+                        panel.stacksText.gameObject.SetActive(true);
+                        panel.stacksText.text = "" + i.stacks;
+                    }
                 }
                 else
                 {
                     panel.itemImage.gameObject.SetActive(false);
                     panel.stacksText.gameObject.SetActive(false);
+                    panel.starImage.gameObject.SetActive(false);
+                    panel.starText.gameObject.SetActive(false);
+                    panel.confidenceImage.gameObject.SetActive(false);
+                    panel.confidenceText.gameObject.SetActive(false);
                 }
             }
             index++;
