@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
+using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerController : MonoBehaviour
 {
+    public Inventory inventory;
+
     public Rigidbody rb;
     public float moveSpeed = 5f;
     public PlayerInputActions playerControls;
+    public GameObject bullet;
+    public GameObject currentDragon;
 
     Vector2 moveDirection = Vector2.zero;
     private InputAction move;
     private InputAction fire;
 
     private Animator animator;
+    private int storedBullets = 5;
+    private float counter = 0;
+    private float delay;
+
 
     private void Awake()
     {
@@ -43,6 +52,25 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         moveDirection = move.ReadValue<Vector2>();
+        delay += Time.deltaTime;
+
+        if (storedBullets < 5)
+        {
+            counter += Time.deltaTime;
+            if (counter >= 2)
+            {
+                storedBullets += 1;
+                counter = 0;
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Mouse0) && !inventory.inventoryMenu.activeSelf && storedBullets > 0 && delay >= 0.2f)
+        {
+            Debug.Log("trying to shoot");
+            storedBullets--;
+            delay = 0f;
+            Instantiate(bullet, currentDragon.transform.position, Quaternion.identity);
+        }
     }
 
     private void FixedUpdate()
