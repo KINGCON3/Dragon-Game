@@ -69,7 +69,11 @@ public class PlayerController : MonoBehaviour
             Debug.Log("trying to shoot");
             storedBullets--;
             delay = 0f;
-            Instantiate(bullet, currentDragon.transform.position, Quaternion.identity);
+            Vector3 shootDir = (currentDragon.transform.position - rb.transform.position).normalized;
+
+            GameObject bulletTransform = Instantiate(bullet, currentDragon.transform.position, Quaternion.LookRotation(shootDir) * Quaternion.Euler(0, -90, 0));
+
+            bulletTransform.GetComponent<Bullet>().Setup(shootDir);
         }
     }
 
