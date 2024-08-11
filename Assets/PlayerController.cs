@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 using UnityEngine.InputSystem.LowLevel;
+using Unity.Netcode;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     public Inventory inventory;
 
@@ -29,6 +30,20 @@ public class PlayerController : MonoBehaviour
     {
         playerControls = new PlayerInputActions();
         animator = GetComponent<Animator>();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        //base.OnNetworkSpawn();
+        if (!IsOwner)
+        {
+            //AudioListener aL = this.GetComponentInChildren<AudioListener>();
+            transform.FindChild("Main Camera").gameObject.SetActive(false);
+            //aL.enabled = false;
+            enabled = false;
+            Debug.Log("not the owner");
+        }
+        //base.OnNetworkSpawn();
     }
 
     private void OnEnable()
@@ -69,12 +84,32 @@ public class PlayerController : MonoBehaviour
             Debug.Log("trying to shoot");
             storedBullets--;
             delay = 0f;
-            Vector3 shootDir = (currentDragon.transform.position - rb.transform.position).normalized;
+            
 
-            GameObject bulletTransform = Instantiate(bullet, currentDragon.transform.position, Quaternion.LookRotation(shootDir) * Quaternion.Euler(0, -90, 0));
+            if (IsServer)
+            {
+                SpawnToNetwork();
+            }
+            else
+            {
+                SpawnOnServerRpc();
+            }
 
-            bulletTransform.GetComponent<Bullet>().Setup(shootDir);
         }
+    }
+
+    private void SpawnToNetwork()
+    {
+        Vector3 shootDir = (currentDragon.transform.position - rb.transform.position).normalized;
+        GameObject bulletTransform = Instantiate(bullet, currentDragon.transform.position, Quaternion.LookRotation(shootDir) * Quaternion.Euler(0, -90, 0));
+        bulletTransform.GetComponent<Bullet>().Setup(shootDir);
+        bulletTransform.GetComponent<NetworkObject>().Spawn();
+    }
+
+    [ServerRpc]
+    private void SpawnOnServerRpc()
+    {
+        SpawnToNetwork();
     }
 
     private void FixedUpdate()
