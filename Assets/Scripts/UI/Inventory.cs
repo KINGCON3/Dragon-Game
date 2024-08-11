@@ -5,6 +5,9 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using Unity.Services.Matchmaker.Models;
 using UnityEngine.Assertions.Must;
+using UnityEditor;
+using UnityEngine.UI;
+using Unity.Mathematics;
 
 public class Inventory : MonoBehaviour
 {
@@ -15,6 +18,7 @@ public class Inventory : MonoBehaviour
     public GameObject inventoryMenu;
     public GameObject itemPanel;
     public GameObject itemPanelGrid;
+    public GameObject autoSortButton;
 
     public Mouse mouse;
     public GameObject player;
@@ -55,7 +59,76 @@ public class Inventory : MonoBehaviour
         //AddItem("Wood", 44);
         //AddItem("Stone", 20);
         AddItem("OneGreenDragon", 3);
+        AddItem("TwoGreenDragon", 3);
+        AddItem("ThreeGreenDragon", 3);
+        AddItem("FourGreenDragon", 3);
+        AddItem("FiveGreenDragon", 3);
         AddItem("Egg", 100);
+
+        Button button = autoSortButton.GetComponent<Button>();
+   
+        if (button != null)
+        {
+            button.onClick.AddListener(buttonClick);
+        }
+        else
+        {
+            Debug.LogWarning("No Button component found.");
+        }
+    }
+
+    void buttonClick()
+    {
+        Debug.Log("Yes");
+        string oldlist = "";
+        string newlist = "";
+        foreach (ItemSlotInfo i in items)
+        {
+            if (i.item != null)
+            {
+                oldlist = oldlist + i.item.GiveName();
+            }
+        }
+
+        // star then colour
+        items.Sort((item1, item2) =>
+        {
+            // Handle null cases first
+            if (item1.item == null && item2.item == null)
+            {
+                return 0; // Both items are null, consider them equal
+            }
+            if (item1.item == null)
+            {
+                return 1; // Null items go to the end
+            }
+            if (item2.item == null)
+            {
+                return -1; // Null items go to the end
+            }
+
+            // Proceed with comparisons if both items are non-null
+            int starComparison = item2.item.GiveStar().CompareTo(item1.item.GiveStar());
+            if (starComparison == 0)
+            {
+                return math.max(item1.item.GiveColour(), item2.item.GiveColour());
+            }
+
+            return starComparison; // Return the star comparison if not equal
+        });
+
+
+        foreach (ItemSlotInfo i in items)
+        {
+            if (i.item != null)
+            {
+                newlist = newlist + i.item.GiveName();
+            }
+        }
+
+        Debug.Log(oldlist);
+        Debug.Log(newlist);
+
     }
 
     // Update is called once per frame
@@ -67,11 +140,15 @@ public class Inventory : MonoBehaviour
             {
                 inventoryMenu.SetActive(false);
                 mouse.EmptySlot();
+                autoSortButton.SetActive(false);
+                mouse.gameObject.SetActive(false);
                 //Cursor.lockState = CursorLockMode.Locked;
             }
             else
             {
                 inventoryMenu.SetActive(true);
+                autoSortButton.SetActive(true);
+                mouse.gameObject.SetActive(true);
                 //Cursor.lockState = CursorLockMode.Confined;
                 RefreshInventory();
             }
