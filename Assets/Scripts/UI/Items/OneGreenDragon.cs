@@ -20,4 +20,6 @@ public class OneGreenDragon : Item
     public override int GiveStar()
     { return 1; }
     public override int GiveColour() { return 1; }
+
+    public override int GiveConfidence() { return 98; }
 }

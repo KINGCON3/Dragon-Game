@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Linq;
 using Unity.Services.Matchmaker.Models;
+using UnityEngine.Assertions.Must;
 
 public class Inventory : MonoBehaviour
 {
@@ -51,9 +52,10 @@ public class Inventory : MonoBehaviour
         Debug.Log(itemsInDictionary);
 
         //Add Items for testing
-        AddItem("Wood", 44);
-        AddItem("Stone", 20);
+        //AddItem("Wood", 44);
+        //AddItem("Stone", 20);
         AddItem("OneGreenDragon", 3);
+        AddItem("Egg", 100);
     }
 
     // Update is called once per frame
@@ -89,6 +91,37 @@ public class Inventory : MonoBehaviour
 
     public void RefreshInventory()
     {
+        int eggPos = -1;
+        int count = -1;
+        ItemSlotInfo egg = null;
+        ItemSlotInfo itemToSwap = null;
+        foreach (ItemSlotInfo i in items)
+        {
+            if (i.item != null)
+            {
+                count += 1;
+                if (i.item.GiveName().Equals("Egg"))
+                {
+                    eggPos = count;
+                    egg = i;
+                }
+                itemToSwap = i;
+            }
+        }
+        //Debug.Log(eggPos);
+        //Debug.Log(count + 1);
+
+        if (eggPos > -1 && eggPos != count)
+        {
+            ItemSlotInfo tempItem = new ItemSlotInfo(egg.item, egg.stacks);
+            egg.item = itemToSwap.item;
+            egg.stacks = itemToSwap.stacks;
+
+            itemToSwap.item = tempItem.item;
+            itemToSwap.stacks = tempItem.stacks;
+        }
+
+
         existingPanels = itemPanelGrid.GetComponentsInChildren<ItemPanel>().ToList();
         //Create Panels if needed
         if (existingPanels.Count < inventorySize)
@@ -100,6 +133,7 @@ public class Inventory : MonoBehaviour
                 existingPanels.Add(newPanel.GetComponent<ItemPanel>());
             }
         }
+
 
         int index = 0;
         foreach (ItemSlotInfo i in items)
@@ -124,15 +158,26 @@ public class Inventory : MonoBehaviour
                     panel.itemImage.CrossFadeAlpha(1, 0.05f, true);
                     if (panel.name.Contains("Dragon"))
                     {
-                        Debug.Log("dragon");
+                        //Debug.Log("dragon");
+                        //Set star text
+                        panel.starText.text = i.item.GiveStar().ToString();
+                        //set confidence text
+                        panel.confidenceText.text = i.item.GiveConfidence().ToString();
+
                         panel.starImage.gameObject.SetActive(true);
                         panel.starText.gameObject.SetActive(true);
                         panel.confidenceImage.gameObject.SetActive(true);
                         panel.confidenceText.gameObject.SetActive(true);
+                        panel.stacksText.gameObject.SetActive(false);
                     } else
                     {
                         panel.stacksText.gameObject.SetActive(true);
                         panel.stacksText.text = "" + i.stacks;
+
+                        panel.starImage.gameObject.SetActive(false);
+                        panel.starText.gameObject.SetActive(false);
+                        panel.confidenceImage.gameObject.SetActive(false);
+                        panel.confidenceText.gameObject.SetActive(false);
                     }
                 }
                 else

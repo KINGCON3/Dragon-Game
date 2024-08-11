@@ -118,6 +118,26 @@ public class ItemPanel : MonoBehaviour, IPointerEnterHandler, IPointerDownHandle
         }
     }
 
+    //returns the actual pos of egg (+1) not the index
+    public int getEggPos()
+    {
+        int eggPos = 99;
+        int count = 0;
+        List<ItemSlotInfo> items = inventory.getItems();
+        foreach (ItemSlotInfo i in items)
+        {
+            count += 1;
+            if (i.item != null)
+            {
+                if (i.item.GiveName().Equals("Egg"))
+                {
+                    eggPos = count;
+                }
+            }
+        }
+        return eggPos;
+    }
+
     public ItemSlotInfo getNextNonMax(Item item)
     {
         //Debug.Log(item.GiveName());
@@ -194,14 +214,25 @@ public class ItemPanel : MonoBehaviour, IPointerEnterHandler, IPointerDownHandle
                 //Clicked on empty slot
                 else if (itemSlot.item == null)
                 {
-                    DropItem();
-                    inventory.RefreshInventory();
+                    string[] itemSlotArray = itemSlot.name.Split(':');
+                    int itemSlotNumber = int.Parse(itemSlotArray[0]);
+                    Debug.Log(itemSlot.name + " name of item slot");
+                    //Debug.Log(itemSlotNumber + " converted to number");
+                    Debug.Log(getEggPos() + " current egg position");
+                    if (itemSlotNumber < getEggPos() || mouse.itemSlot.item.GiveName().Equals("Egg"))
+                    {
+                        DropItem();
+                        inventory.RefreshInventory();
+                    }
                 }
                 //Clicked on occupied slot of different item type
                 else if (itemSlot.item.GiveName() != mouse.itemSlot.item.GiveName())
                 {
-                    SwapItem(itemSlot, mouse.itemSlot);
-                    inventory.RefreshInventory();
+                    if (itemSlot.item.GiveName() != "Egg")
+                    {
+                        SwapItem(itemSlot, mouse.itemSlot);
+                        inventory.RefreshInventory();
+                    }
                 }
                 //Clicked on occupied slot of same type
                 else if (itemSlot.stacks < itemSlot.item.MaxStacks())
