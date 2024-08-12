@@ -82,13 +82,13 @@ public class Inventory : MonoBehaviour
         Debug.Log("Yes");
         string oldlist = "";
         string newlist = "";
-        foreach (ItemSlotInfo i in items)
-        {
-            if (i.item != null)
-            {
-                oldlist = oldlist + i.item.GiveName();
-            }
-        }
+        //foreach (ItemSlotInfo i in items)
+        //{
+        //    if (i.item != null)
+        //    {
+        //        oldlist = oldlist + i.item.GiveName();
+        //    }
+        //}
 
         // star then colour
         items.Sort((item1, item2) =>
@@ -118,17 +118,18 @@ public class Inventory : MonoBehaviour
         });
 
 
-        foreach (ItemSlotInfo i in items)
-        {
-            if (i.item != null)
-            {
-                newlist = newlist + i.item.GiveName();
-            }
-        }
+        //foreach (ItemSlotInfo i in items)
+        //{
+        //    if (i.item != null)
+        //    {
+        //        newlist = newlist + i.item.GiveName();
+        //    }
+        //}
 
-        Debug.Log(oldlist);
-        Debug.Log(newlist);
+        //Debug.Log(oldlist);
+        //Debug.Log(newlist);
 
+        RefreshInventory();
     }
 
     // Update is called once per frame
