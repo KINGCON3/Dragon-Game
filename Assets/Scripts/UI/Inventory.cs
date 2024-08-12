@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Linq;
 using Unity.Services.Matchmaker.Models;
+using UnityEngine.Assertions.Must;
+using UnityEditor;
+using UnityEngine.UI;
+using Unity.Mathematics;
 
 public class Inventory : MonoBehaviour
 {
@@ -14,6 +18,7 @@ public class Inventory : MonoBehaviour
     public GameObject inventoryMenu;
     public GameObject itemPanel;
     public GameObject itemPanelGrid;
+    public GameObject autoSortButton;
 
     public Mouse mouse;
     public GameObject player;
@@ -51,9 +56,80 @@ public class Inventory : MonoBehaviour
         Debug.Log(itemsInDictionary);
 
         //Add Items for testing
-        AddItem("Wood", 44);
-        AddItem("Stone", 20);
+        //AddItem("Wood", 44);
+        //AddItem("Stone", 20);
         AddItem("OneGreenDragon", 3);
+        AddItem("TwoGreenDragon", 3);
+        AddItem("ThreeGreenDragon", 3);
+        AddItem("FourGreenDragon", 3);
+        AddItem("FiveGreenDragon", 3);
+        AddItem("Egg", 100);
+
+        Button button = autoSortButton.GetComponent<Button>();
+   
+        if (button != null)
+        {
+            button.onClick.AddListener(buttonClick);
+        }
+        else
+        {
+            Debug.LogWarning("No Button component found.");
+        }
+    }
+
+    void buttonClick()
+    {
+        Debug.Log("Yes");
+        string oldlist = "";
+        string newlist = "";
+        //foreach (ItemSlotInfo i in items)
+        //{
+        //    if (i.item != null)
+        //    {
+        //        oldlist = oldlist + i.item.GiveName();
+        //    }
+        //}
+
+        // star then colour
+        items.Sort((item1, item2) =>
+        {
+            // Handle null cases first
+            if (item1.item == null && item2.item == null)
+            {
+                return 0; // Both items are null, consider them equal
+            }
+            if (item1.item == null)
+            {
+                return 1; // Null items go to the end
+            }
+            if (item2.item == null)
+            {
+                return -1; // Null items go to the end
+            }
+
+            // Proceed with comparisons if both items are non-null
+            int starComparison = item2.item.GiveStar().CompareTo(item1.item.GiveStar());
+            if (starComparison == 0)
+            {
+                return math.max(item1.item.GiveColour(), item2.item.GiveColour());
+            }
+
+            return starComparison; // Return the star comparison if not equal
+        });
+
+
+        //foreach (ItemSlotInfo i in items)
+        //{
+        //    if (i.item != null)
+        //    {
+        //        newlist = newlist + i.item.GiveName();
+        //    }
+        //}
+
+        //Debug.Log(oldlist);
+        //Debug.Log(newlist);
+
+        RefreshInventory();
     }
 
     // Update is called once per frame
@@ -65,11 +141,15 @@ public class Inventory : MonoBehaviour
             {
                 inventoryMenu.SetActive(false);
                 mouse.EmptySlot();
+                autoSortButton.SetActive(false);
+                mouse.gameObject.SetActive(false);
                 //Cursor.lockState = CursorLockMode.Locked;
             }
             else
             {
                 inventoryMenu.SetActive(true);
+                autoSortButton.SetActive(true);
+                mouse.gameObject.SetActive(true);
                 //Cursor.lockState = CursorLockMode.Confined;
                 RefreshInventory();
             }
@@ -89,6 +169,37 @@ public class Inventory : MonoBehaviour
 
     public void RefreshInventory()
     {
+        int eggPos = -1;
+        int count = -1;
+        ItemSlotInfo egg = null;
+        ItemSlotInfo itemToSwap = null;
+        foreach (ItemSlotInfo i in items)
+        {
+            if (i.item != null)
+            {
+                count += 1;
+                if (i.item.GiveName().Equals("Egg"))
+                {
+                    eggPos = count;
+                    egg = i;
+                }
+                itemToSwap = i;
+            }
+        }
+        //Debug.Log(eggPos);
+        //Debug.Log(count + 1);
+
+        if (eggPos > -1 && eggPos != count)
+        {
+            ItemSlotInfo tempItem = new ItemSlotInfo(egg.item, egg.stacks);
+            egg.item = itemToSwap.item;
+            egg.stacks = itemToSwap.stacks;
+
+            itemToSwap.item = tempItem.item;
+            itemToSwap.stacks = tempItem.stacks;
+        }
+
+
         existingPanels = itemPanelGrid.GetComponentsInChildren<ItemPanel>().ToList();
         //Create Panels if needed
         if (existingPanels.Count < inventorySize)
@@ -100,6 +211,7 @@ public class Inventory : MonoBehaviour
                 existingPanels.Add(newPanel.GetComponent<ItemPanel>());
             }
         }
+
 
         int index = 0;
         foreach (ItemSlotInfo i in items)
@@ -124,15 +236,26 @@ public class Inventory : MonoBehaviour
                     panel.itemImage.CrossFadeAlpha(1, 0.05f, true);
                     if (panel.name.Contains("Dragon"))
                     {
-                        Debug.Log("dragon");
+                        //Debug.Log("dragon");
+                        //Set star text
+                        panel.starText.text = i.item.GiveStar().ToString();
+                        //set confidence text
+                        panel.confidenceText.text = i.item.GiveConfidence().ToString();
+
                         panel.starImage.gameObject.SetActive(true);
                         panel.starText.gameObject.SetActive(true);
                         panel.confidenceImage.gameObject.SetActive(true);
                         panel.confidenceText.gameObject.SetActive(true);
+                        panel.stacksText.gameObject.SetActive(false);
                     } else
                     {
                         panel.stacksText.gameObject.SetActive(true);
                         panel.stacksText.text = "" + i.stacks;
+
+                        panel.starImage.gameObject.SetActive(false);
+                        panel.starText.gameObject.SetActive(false);
+                        panel.confidenceImage.gameObject.SetActive(false);
+                        panel.confidenceText.gameObject.SetActive(false);
                     }
                 }
                 else
