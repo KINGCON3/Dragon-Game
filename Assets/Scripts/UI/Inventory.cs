@@ -80,8 +80,8 @@ public class Inventory : MonoBehaviour
     void buttonClick()
     {
         Debug.Log("Yes");
-        string oldlist = "";
-        string newlist = "";
+        //string oldlist = "";
+        //string newlist = "";
         //foreach (ItemSlotInfo i in items)
         //{
         //    if (i.item != null)

@@ -21,6 +21,7 @@ public class PlayerController : NetworkBehaviour
     private InputAction fire;
 
     private Animator animator;
+    private Animator dragon;
     private int storedBullets = 5;
     private float counter = 0;
     private float delay;
@@ -30,6 +31,9 @@ public class PlayerController : NetworkBehaviour
     {
         playerControls = new PlayerInputActions();
         animator = GetComponent<Animator>();
+
+        Transform greenTransform = transform.Find("Green");
+        dragon = greenTransform.GetComponent<Animator>();
     }
 
     public override void OnNetworkSpawn()
@@ -84,7 +88,8 @@ public class PlayerController : NetworkBehaviour
             Debug.Log("trying to shoot");
             storedBullets--;
             delay = 0f;
-            
+
+            dragon.SetTrigger("Shoot");
 
             if (IsServer)
             {
@@ -156,10 +161,12 @@ public class PlayerController : NetworkBehaviour
             }
 
             animator.SetBool("isMoving", true);
+            dragon.SetBool("isFlying", true);
         }
         else
         {
             animator.SetBool("isMoving", false);
+            dragon.SetBool("isFlying", false);
         }
 
         rb.rotation = newRotation;
