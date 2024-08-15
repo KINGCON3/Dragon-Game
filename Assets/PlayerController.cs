@@ -25,15 +25,27 @@ public class PlayerController : NetworkBehaviour
     private int storedBullets = 5;
     private float counter = 0;
     private float delay;
+    private string visibleDragon;
 
 
     private void Awake()
     {
         playerControls = new PlayerInputActions();
         animator = GetComponent<Animator>();
+    }
 
-        Transform greenTransform = transform.Find("Green");
-        dragon = greenTransform.GetComponent<Animator>();
+    public ItemSlotInfo getFirst()
+    {
+        //Debug.Log(item.GiveName());
+        List<ItemSlotInfo> items = inventory.getItems();
+        foreach (ItemSlotInfo i in items)
+        {
+            if (i.item != null)
+            {
+                return i;
+            }
+        }
+        return null;
     }
 
     public override void OnNetworkSpawn()
@@ -101,6 +113,12 @@ public class PlayerController : NetworkBehaviour
             }
 
         }
+
+        visibleDragon = getFirst().item.GiveName();
+        Transform dragonsTransform = transform.Find("Dragons");
+        Transform current = dragonsTransform.Find(visibleDragon);
+        current.gameObject.SetActive(true);
+        dragon = current.GetComponent<Animator>();
     }
 
     private void SpawnToNetwork()
@@ -166,7 +184,9 @@ public class PlayerController : NetworkBehaviour
         else
         {
             animator.SetBool("isMoving", false);
+            if (dragon.isInitialized && dragon.isActiveAndEnabled) {
             dragon.SetBool("isFlying", false);
+            }
         }
 
         rb.rotation = newRotation;
