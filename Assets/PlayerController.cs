@@ -5,6 +5,8 @@ using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 using UnityEngine.InputSystem.LowLevel;
 using Unity.Netcode;
+using Unity.Tutorials.Core.Editor;
+using System;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -25,24 +27,33 @@ public class PlayerController : NetworkBehaviour
     private int storedBullets = 5;
     private float counter = 0;
     private float delay;
-    private string visibleDragon;
+    private string visibleDragon = "";
+    private string newDragon = "";
+    private Transform dragonsTransform;
+    private Transform current;
+    private Boolean isDragon;
 
 
     private void Awake()
     {
         playerControls = new PlayerInputActions();
         animator = GetComponent<Animator>();
+
+        dragonsTransform = transform.Find("Dragons");
     }
 
     public ItemSlotInfo getFirst()
     {
-        //Debug.Log(item.GiveName());
+        // Get the first dragon
         List<ItemSlotInfo> items = inventory.getItems();
         foreach (ItemSlotInfo i in items)
         {
             if (i.item != null)
             {
-                return i;
+                if (i.item.GiveName().Contains("Dragon"))
+                {
+                    return i;
+                }
             }
         }
         return null;
@@ -101,7 +112,10 @@ public class PlayerController : NetworkBehaviour
             storedBullets--;
             delay = 0f;
 
-            dragon.SetTrigger("Shoot");
+            if (dragon != null)
+            {
+                dragon.SetTrigger("Shoot");
+            }
 
             if (IsServer)
             {
@@ -114,11 +128,45 @@ public class PlayerController : NetworkBehaviour
 
         }
 
-        visibleDragon = getFirst().item.GiveName();
-        Transform dragonsTransform = transform.Find("Dragons");
-        Transform current = dragonsTransform.Find(visibleDragon);
-        current.gameObject.SetActive(true);
-        dragon = current.GetComponent<Animator>();
+        if (getFirst() == null)
+        {
+            isDragon = false;
+        } else
+        {
+            isDragon = true;
+            newDragon = getFirst().item.GiveName();
+        }
+
+        //First spawn
+        if (isDragon && visibleDragon.Equals(""))
+        {
+            //Set visible
+            visibleDragon = newDragon;
+            Debug.Log(visibleDragon);
+            current = dragonsTransform.Find(visibleDragon);
+            current.gameObject.SetActive(true);
+            dragon = current.GetComponent<Animator>();
+        }
+        //Dragon just died/no dragons remaining
+        else if (!isDragon && !visibleDragon.Equals(""))
+        {
+            //Hide last dragon
+            current = dragonsTransform.Find(visibleDragon);
+            current.gameObject.SetActive(false);
+            visibleDragon = "";
+        } else if (isDragon && !visibleDragon.Equals(newDragon))
+        {
+            //hide current one
+            current = dragonsTransform.Find(visibleDragon);
+            current.gameObject.SetActive(false);
+
+            //Reset visible
+            current = dragonsTransform.Find(newDragon);
+            current.gameObject.SetActive(true);
+            dragon = current.GetComponent<Animator>();
+
+            visibleDragon = newDragon;
+        }
     }
 
     private void SpawnToNetwork()
@@ -179,12 +227,15 @@ public class PlayerController : NetworkBehaviour
             }
 
             animator.SetBool("isMoving", true);
-            dragon.SetBool("isFlying", true);
+            if (dragon != null)
+            {
+                dragon.SetBool("isFlying", true);
+            }
         }
         else
         {
             animator.SetBool("isMoving", false);
-            if (dragon.isInitialized && dragon.isActiveAndEnabled) {
+            if (dragon != null) {
             dragon.SetBool("isFlying", false);
             }
         }

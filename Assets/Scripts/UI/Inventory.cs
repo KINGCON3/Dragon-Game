@@ -58,11 +58,17 @@ public class Inventory : MonoBehaviour
         //Add Items for testing
         //AddItem("Wood", 44);
         //AddItem("Stone", 20);
-        AddItem("OneGreenDragon", 3);
-        AddItem("TwoGreenDragon", 3);
-        AddItem("ThreeGreenDragon", 3);
-        AddItem("FourGreenDragon", 3);
-        AddItem("FiveGreenDragon", 3);
+        AddItem("OneGreenDragon", 1);
+        AddItem("OneYellowDragon", 1);
+        AddItem("OneOrangeDragon", 1);
+        AddItem("OneRedDragon", 1);
+        AddItem("OneBlackDragon", 1);
+        AddItem("OneWhiteDragon", 1);
+
+        //AddItem("TwoGreenDragon", 3);
+        //AddItem("ThreeGreenDragon", 3);
+        //AddItem("FourGreenDragon", 3);
+        //AddItem("FiveGreenDragon", 3);
         AddItem("Egg", 100);
 
         Button button = autoSortButton.GetComponent<Button>();
@@ -111,7 +117,10 @@ public class Inventory : MonoBehaviour
             int starComparison = item2.item.GiveStar().CompareTo(item1.item.GiveStar());
             if (starComparison == 0)
             {
-                return math.max(item1.item.GiveColour(), item2.item.GiveColour());
+                Debug.Log(item1.item.GiveColour());
+                Debug.Log(item2.item.GiveColour());
+
+                return item2.item.GiveColour().CompareTo(item1.item.GiveColour());
             }
 
             return starComparison; // Return the star comparison if not equal
