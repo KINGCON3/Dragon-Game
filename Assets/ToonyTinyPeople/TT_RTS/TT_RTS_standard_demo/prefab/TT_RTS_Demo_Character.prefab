@@ -384,7 +384,7 @@ MonoBehaviour:
   rb: {fileID: 4074801430939558507}
   moveSpeed: 5
   bullet: {fileID: 1922472477238821003, guid: 878ff0fac1fce9f4abc83a4fd32fd234, type: 3}
-  currentDragon: {fileID: 2033729958704846225}
+  currentDragon: {fileID: 6359890647117919005}
 --- !u!136 &5818818504237091718
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2456,7 +2456,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3150192817774593267
 Transform:
   m_ObjectHideFlags: 0
